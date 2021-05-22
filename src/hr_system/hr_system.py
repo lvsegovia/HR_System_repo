@@ -4,6 +4,9 @@ from operator import itemgetter
 
 
 cwd = os.getcwd()
+employees = {
+#"ID":["NAME","STREET","CITY","STATE","ZIP","SSN","DOB","JOB","START","END"]
+}
 prompt = "\n HR SYSTEM OPTION MENU"
 prompt += "\n Press 1: 'Display current employees'"
 prompt += "\n Press 2: 'Add new employee'"
@@ -14,23 +17,62 @@ prompt += "\n Type here: "
 
 
 def read_csv():
-    content=""
     with open(cwd + "\\" + "hr_records.csv", "r") as input_file:
         for line in input_file:
-            print(line)
-            content += line
-    return content
+            create_database(line)
+    #print(employees)
+    return employees
+
+
+def create_database(line):
+    line = line.replace("\n", "") # Removes end of row delimited by "\n"
+    line_list = line.split(",") # A row ends with "\n"
+    employees[line_list[0]]=line_list[1:]
+
+
+def create_list(line):
+    list = line.split(",")
+    print(list)
+    return list
 
 
 def display_employees():
-    print("Content is\n" + read_csv())
-
+    print(employees)
 
 
 def add_employee():
-    print("add")
-    pass
-
+    msg_name = input("\nType NAME: ")
+    msg_street = input("\nType STREET: ")
+    msg_city = input("\nType CITY: ")
+    msg_state = input("\nType STATE: ")
+    msg_zip = input("\nType ZIP: ")
+    msg_ssn = input("\nType SSN: ")
+    msg_dob = input("\nType DOB: ")
+    msg_job = input("\nType JOB: ")
+    msg_start = input("\nType START: ")
+    msg_end = input("\nType END: ")
+    new_id= len(employees.keys()) # Taking into account that first key is the title
+    employees[new_id]=[
+    msg_name,
+    msg_street,
+    msg_city,
+    msg_state,
+    msg_zip,
+    msg_ssn,
+    msg_dob,
+    msg_job,
+    msg_start,
+    msg_end
+    ]
+    line = ""
+    unwanted_chars = ["[","]","'"]
+    with open(cwd + "\\" + "hr_records.csv", "a") as input_file:
+        line += str(employees[new_id])
+        for i in unwanted_chars:
+            line = line.replace(i, "")
+        line = str(new_id)+","+ line + "\n"
+        input_file.write(line)
+    line = ""
 
 def edit_employee():
     print("edit")
@@ -54,6 +96,7 @@ def main():
         "4":list_past_employee,
         "5":salir,
     }
+    read_csv()
     while True:
         try:
             main_d[input(prompt)]()
