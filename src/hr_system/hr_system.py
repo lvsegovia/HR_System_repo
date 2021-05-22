@@ -3,6 +3,7 @@ import os
 from operator import itemgetter
 
 
+cwd = os.getcwd()
 prompt = "\n HR SYSTEM OPTION MENU"
 prompt += "\n Press 1: 'Display current employees'"
 prompt += "\n Press 2: 'Add new employee'"
@@ -13,23 +14,17 @@ prompt += "\n Type here: "
 
 
 def read_csv():
-    for k, v in donors.items():
-        sum=0
-        for num in v[:]:
-            sum = sum + num
-        with open( os.getcwd() +"\\"+ f"{k}" + ".txt","w" ) as letter:
-            content = f"Dear {k.title()},\n\n"\
-                      f"\tThank you for your very kind donation of ${sum}.\n"\
-                      "\tIt will be put to very good use.\n\n"\
-                      "\t\t\t\tSincerely,\n"\
-                      "\t\t\t\t-The Team"
-            letter.write(content)
-    print("\nLetters were sent, check current directory.")
+    content=""
+    with open(cwd + "\\" + "hr_records.csv", "r") as input_file:
+        for line in input_file:
+            print(line)
+            content += line
+    return content
 
 
 def display_employees():
-    print("display")
-    pass
+    print("Content is\n" + read_csv())
+
 
 
 def add_employee():
