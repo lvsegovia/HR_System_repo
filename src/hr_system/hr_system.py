@@ -20,6 +20,10 @@ fields = {
 "start":8,
 "end":9,
 }
+header_break = "-"*3 + " "*2 + "-"*10 + " "*2 + "-"*20 + " "*2 + "-"*10 + " "*2 +\
+"-"*7 + " "*2 + "-"*7 + " "*2 + "-"*13 + " "*2 + "-"*13 + " "*2 + "-"*20 +\
+" "*2 + "-"*13 + " "*2 + "-"*10 + " "*2
+
 prompt = "\n HR SYSTEM OPTION MENU"
 prompt += "\n Press 1: 'Display all employees'"
 prompt += "\n Press 2: 'Display current employees'"
@@ -43,79 +47,46 @@ def create_database(line):
     employees[line_list[0]]=line_list[1:]
 
 
-def create_list(line):
-    list = line.split(",")
-    print(list)
-    return list
-
-
 def display_all_employees():
-    table = "\n"
+    # "ID":["NAME","STREET","CITY","STATE","ZIP","SSN","DOB","JOB","START","END"]
+    print("\n")
     for k,v in employees.items():
-        table += "{:^3}".format(k) + "|"
-        for i in range (len(v)):
-            if i == len(v)-1: # END
-                table += "{:^10}".format( v[i][:10] ) + "\n"
-            elif i == 0 or i == 2: # NAME or CITY
-                table += "{:^10}".format( v[i][:10] ) + "|"
-            elif i == 1: # STREET
-                table += "{:^20}".format( v[i][:20] ) + "|"
-            elif i == 3 or i ==4: # STATE or ZIP
-                table += "{:^7}".format( v[i][:5] ) + "|"
-            elif i == 5 or i == 6 or i == 8: # SSN or DOB or START
-                table += "{:^13}".format( v[i][:13] ) + "|"
-            elif i == 7: # JOB
-                table += "{:^20}".format( v[i][:20] ) + "|"
-    print (table)
-    report_msg = input("Do you want a csv report?, y/n: ")
+        name,street,city,state,zip,ssn,dob,job,start,end = v
+        print ("{:^5}{:^12}{:^22}{:^12}{:^9}{:^9}{:^15}{:^15}{:^22}{:^15}{:^12}\
+        ".format(k,name,street,city,state,zip,ssn,dob,job,start,end))
+        if k == "ID":
+            print(header_break)
+    report_msg = input("\nDo you want a csv report?, y/n: ")
     if report_msg.lower() == "y":
         report_all_csv()
 
 
 def display_current_employees():
-    table = "\n"
+    # "ID":["NAME","STREET","CITY","STATE","ZIP","SSN","DOB","JOB","START","END"]
+    print("\n")
     for k,v in employees.items():
         if v[-1].lower() == "active" or v[-1].lower() == "end":
-            table += "{:^3}".format(k) + "|"
-            for i in range (len(v)):
-                if i == len(v)-1: # END
-                    table += "{:^10}".format( v[i][:10] ) + "\n"
-                elif i == 0 or i == 2: # NAME or CITY
-                    table += "{:^10}".format( v[i][:10] ) + "|"
-                elif i == 1: # STREET
-                    table += "{:^20}".format( v[i][:20] ) + "|"
-                elif i == 3 or i ==4: # STATE or ZIP
-                    table += "{:^7}".format( v[i][:5] ) + "|"
-                elif i == 5 or i == 6 or i == 8: # SSN or DOB or START
-                    table += "{:^13}".format( v[i][:13] ) + "|"
-                elif i == 7: # JOB
-                    table += "{:^20}".format( v[i][:20] ) + "|"
-    print (table)
-    report_msg = input("Do you want a csv report?, y/n: ")
+            name,street,city,state,zip,ssn,dob,job,start,end = v
+            print ("{:^5}{:^12}{:^22}{:^12}{:^9}{:^9}{:^15}{:^15}{:^22}{:^15}{:^12}\
+            ".format(k,name,street,city,state,zip,ssn,dob,job,start,end))
+            if k == "ID":
+                print(header_break)
+    report_msg = input("\nDo you want a csv report?, y/n: ")
     if report_msg.lower() == "y":
         report_current_csv()
 
 
 def display_past_employees():
-    table = "\n"
+    # "ID":["NAME","STREET","CITY","STATE","ZIP","SSN","DOB","JOB","START","END"]
+    print("\n")
     for k,v in employees.items():
         if "active" not in v[-1].lower() or v[-1].lower() == "end":
-            table += "{:^3}".format(k) + "|"
-            for i in range (len(v)):
-                if i == len(v)-1: # END
-                    table += "{:^10}".format( v[i][:10] ) + "\n"
-                elif i == 0 or i == 2: # NAME or CITY
-                    table += "{:^10}".format( v[i][:10] ) + "|"
-                elif i == 1: # STREET
-                    table += "{:^20}".format( v[i][:20] ) + "|"
-                elif i == 3 or i ==4: # STATE or ZIP
-                    table += "{:^7}".format( v[i][:5] ) + "|"
-                elif i == 5 or i == 6 or i == 8: # SSN or DOB or START
-                    table += "{:^13}".format( v[i][:13] ) + "|"
-                elif i == 7: # JOB
-                    table += "{:^20}".format( v[i][:20] ) + "|"
-    print (table)
-    report_msg = input("Do you want a csv report?, y/n: ")
+            name,street,city,state,zip,ssn,dob,job,start,end = v
+            print ("{:^5}{:^12}{:^22}{:^12}{:^9}{:^9}{:^15}{:^15}{:^22}{:^15}{:^12}\
+            ".format(k,name,street,city,state,zip,ssn,dob,job,start,end))
+            if k == "ID":
+                print(header_break)
+    report_msg = input("\nDo you want a csv report?, y/n: ")
     if report_msg.lower() == "y":
         report_past_csv()
 
@@ -160,6 +131,7 @@ def show_id_name():
         table += "{:^10}".format( v[0][:10] ) + "|" + "\n"
     print (table)
 
+
 def edit_employee():
     show_id_name()
     msg_id = input("\nSelect employee ID to edit: ")
@@ -186,7 +158,6 @@ def report_all_csv():
                 else:
                     content += v[i] + ","
         file.write(content)
-
 
 
 def report_current_csv():
