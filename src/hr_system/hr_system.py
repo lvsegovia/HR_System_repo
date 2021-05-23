@@ -8,7 +8,7 @@ employees = {
 # Format:
 # "ID":["NAME","STREET","CITY","STATE","ZIP","SSN","DOB","JOB","START","END"]
 }
-fields = {
+fields = { # Used to convert fields to list
 "name":0,
 "street":1,
 "city":2,
@@ -20,6 +20,7 @@ fields = {
 "start":8,
 "end":9,
 }
+
 header_break = "-"*3 + " "*2 + "-"*10 + " "*2 + "-"*20 + " "*2 + "-"*10 + " "*2 +\
 "-"*7 + " "*2 + "-"*7 + " "*2 + "-"*13 + " "*2 + "-"*13 + " "*2 + "-"*20 +\
 " "*2 + "-"*13 + " "*2 + "-"*10 + " "*2
@@ -153,9 +154,58 @@ def display_past_employees():
 
 
 def add_employee():
+    msg_name = clean_name()
+    msg_street = clean_street()
+    msg_city = clean_city()
+    msg_state = clean_state()
+    msg_zip = clean_zip()
+    msg_ssn = clean_ssn()
+    msg_dob = clean_dob()
+    msg_job = clean_job() # Pending what to do
+    msg_start = clean_start()
+    msg_end = clean_end()
+    new_id= str(len(employees.keys())) # Considers that first key is the title, adds to end
+    employees[new_id]=[ msg_name,msg_street,msg_city,msg_state,msg_zip,
+    msg_ssn,msg_dob,msg_job,msg_start,msg_end ]
+    # Format to write in csv
+    line = ""
+    unwanted_chars = ["[","]","'"]
+    line += str(employees[new_id])
+    for i in unwanted_chars:
+        line = line.replace(i, "")
+    line = str(new_id)+","+ line + "\n"
+    append_csv(line)
+
+
+def clean_name():
     msg_name = input("\nType NAME: ")
+    for i in unwanted_chars: # Removes unwanted chars from list
+        msg_name = msg_name.replace(i, "")
+    list_name = msg_name.split(" ")
+    clean_name = ""
+    for name in list_name:
+        clean_name += name.capitalize() + " "
+    clean_name = clean_name.strip() # Removes leading and trailing spaces
+    return(clean_name)
+
+
+def clean_street():
     msg_street = input("\nType STREET: ")
+    for i in unwanted_chars: # Removes unwanted chars from list
+        msg_street = msg_street.replace(i, "")
+    return(msg_street)
+
+
+def clean_city():
     msg_city = input("\nType CITY: ")
+    for i in unwanted_chars: # Removes unwanted chars from list
+        msg_city = msg_city.replace(i, "")
+    clean_city = "".join(msg_city.split()) # Remove multiple spaces and last
+    clean_city = clean_city.capitalize()
+    return(clean_city)
+
+
+def clean_state():
     while True: # Validate STATE
         msg_state = input("\nType STATE (must be 2 char, example 'WA'): ")
         try:
@@ -166,6 +216,10 @@ def add_employee():
             break
         print("type only 2 characters, no numbers allowed :")
         continue
+    return (msg_state)
+
+
+def clean_zip():
     while True:  # Validate ZIP
         msg_zip = input("\nType ZIP (must be 5 numbers): ")
         try:
@@ -178,6 +232,10 @@ def add_employee():
             break
         print("Zip code must be 5 numbers :")
         continue
+    return (msg_zip)
+
+
+def clean_ssn():
     while True:  # Validate SSN
         msg_ssn = input("\nType SSN (format must be 'XXX-XX-XXXX'): ")
         try:
@@ -200,6 +258,10 @@ def add_employee():
             break
         print("Format = (3 numbers '-' 2 numbers '-' 4 numbers): ")
         continue
+    return (msg_ssn)
+
+
+def clean_dob():
     while True:  # Validate DOB
         msg_dob = input("\nType DOB (format must be 'MMM/DD/YYYY'): ")
         try:
@@ -218,7 +280,15 @@ def add_employee():
             break
         print("Format example = (3 letters('sep') '/' 2 numbers('10') '/' 4 numbers(1984)): ")
         continue
-    msg_job = input("\nType JOB: ") # Pending what to do
+    return(msg_dob)
+
+
+def clean_job():
+    msg_job = input("\nType JOB: ")
+    return(msg_job.upper())
+
+
+def clean_start():
     while True:  # Validate START date
         msg_start = input("\nType START date (format must be 'MMM/DD/YYYY'): ")
         try:
@@ -237,7 +307,10 @@ def add_employee():
             break
         print("Format example = (3 letters('feb') '/' 2 numbers('08') '/' 4 numbers(2008)): ")
         continue
+    return(msg_start)
 
+
+def clean_end():
     while True:
         active_msg = input("\nIs employee active? 'y' or 'n': ")
         try:
@@ -271,52 +344,7 @@ def add_employee():
             break
         print("type only 'y' or 'n' :")
         continue
-
-    new_id= str(len(employees.keys())) # Considers that first key is the title, adds to end
-    employees[new_id]=[ clean_name(msg_name), clean_street(msg_street),
-    clean_city(msg_city), clean_state(msg_state), msg_zip,msg_ssn,
-    msg_dob,clean_job(msg_job),msg_start,msg_end]
-    line = ""
-    unwanted_chars = ["[","]","'"]
-    line += str(employees[new_id])
-    for i in unwanted_chars:
-        line = line.replace(i, "")
-    line = str(new_id)+","+ line + "\n"
-    append_csv(line)
-
-
-def clean_name(input):
-    for i in unwanted_chars: # Removes unwanted chars from list
-        input = input.replace(i, "")
-    list_name = input.split(" ")
-    clean_name = ""
-    for name in list_name:
-        clean_name += name.capitalize() + " "
-    clean_name = clean_name.strip() # Removes leading and trailing spaces
-    return(clean_name)
-
-def clean_street(street):
-    for i in unwanted_chars: # Removes unwanted chars from list
-        street = street.replace(i, "")
-    return(street)
-
-
-def clean_city(city):
-    for i in unwanted_chars: # Removes unwanted chars from list
-        city = city.replace(i, "")
-    clean_city = "".join(city.split()) # Remove multiple spaces and last
-    clean_city = clean_city.capitalize()
-    return(clean_city)
-
-
-def clean_state(state):
-    for i in unwanted_chars: # Removes unwanted chars from list
-        state = state.replace(i, "")
-    clean_state = state.upper()
-    return(clean_state)
-
-def clean_job(job):
-    return(job.upper())
+    return (msg_end)
 
 
 def show_id_name():
@@ -329,10 +357,30 @@ def show_id_name():
 
 def edit_employee():
     show_id_name()
-    msg_id = input("\nSelect employee ID to edit: ")
-    msg_field = input("""'NAME','STREET','CITY','STATE','ZIP','SSN','DOB','JOB','START','END'
+    while True:  # Validate START date
+        msg_id = input("\nSelect employee ID to edit: ")
+        try:
+            employees[msg_id]
+            break
+        except KeyError:
+            print("Select existing employee")
+            continue
+        except ValueError:
+            continue
+        except IndexError:
+            continue
+        continue
+    while True:
+        msg_field = input("""'NAME','STREET','CITY','STATE','ZIP','SSN','DOB','JOB','START','END'
     Type field to edit: """)
-    msg_value = input("""\n Type new value: """)
+        try:
+            fields[msg_field.lower()]
+            break
+        except KeyError:
+            print("Type valid field")
+            continue
+        continue
+    msg_value = fields_fun[msg_field]() # Clean the data using dictionary accordingly
     employees[msg_id][ fields[msg_field.lower()] ] = msg_value
     update_csv()
 
@@ -404,6 +452,18 @@ def append_csv(line): # Entry line must be in csv format
 def salir():
     sys.exit()
 
+fields_fun = { # Assings funtions to fields
+"name":clean_name,
+"street":clean_street,
+"city":clean_city,
+"state":clean_state,
+"zip":clean_zip,
+"ssn":clean_ssn,
+"dob":clean_dob,
+"job":clean_job,
+"start":clean_start,
+"end":clean_end,
+}
 
 def main():
     main_d = {
