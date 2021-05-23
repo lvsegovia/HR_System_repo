@@ -5,7 +5,20 @@ from operator import itemgetter
 
 cwd = os.getcwd()
 employees = {
-#"ID":["NAME","STREET","CITY","STATE","ZIP","SSN","DOB","JOB","START","END"]
+# Format:
+# "ID":["NAME","STREET","CITY","STATE","ZIP","SSN","DOB","JOB","START","END"]
+}
+fields = {
+"name":0,
+"street":1,
+"city":2,
+"state":3,
+"zip":4,
+"ssn":5,
+"dob":6,
+"job":7,
+"start":8,
+"end":9,
 }
 prompt = "\n HR SYSTEM OPTION MENU"
 prompt += "\n Press 1: 'Display all employees'"
@@ -14,7 +27,7 @@ prompt += "\n Press 3: 'Display past employees'"
 prompt += "\n Press 4: 'Add new employee'"
 prompt += "\n Press 5: 'Edit employee record'"
 prompt += "\n Press 6: 'Exit program'"
-prompt += "\n Type '1','2','3','4','5','6' or '7' then hit Enter:"
+prompt += "\n Type '1','2','3','4','5' or '6' then hit Enter:"
 
 
 def read_csv():
@@ -54,6 +67,9 @@ def display_all_employees():
             elif i == 7: # JOB
                 table += "{:^20}".format( v[i][:20] ) + "|"
     print (table)
+    report_msg = input("Do you want a csv report?, y/n: ")
+    if report_msg.lower() == "y":
+        report_all_csv()
 
 
 def display_current_employees():
@@ -75,6 +91,9 @@ def display_current_employees():
                 elif i == 7: # JOB
                     table += "{:^20}".format( v[i][:20] ) + "|"
     print (table)
+    report_msg = input("Do you want a csv report?, y/n: ")
+    if report_msg.lower() == "y":
+        report_current_csv()
 
 
 def display_past_employees():
@@ -96,6 +115,10 @@ def display_past_employees():
                 elif i == 7: # JOB
                     table += "{:^20}".format( v[i][:20] ) + "|"
     print (table)
+    report_msg = input("Do you want a csv report?, y/n: ")
+    if report_msg.lower() == "y":
+        report_past_csv()
+
 
 def add_employee():
     msg_name = input("\nType NAME: ")
@@ -108,7 +131,7 @@ def add_employee():
     msg_job = input("\nType JOB: ")
     msg_start = input("\nType START: ")
     msg_end = input("\nType END: ")
-    new_id= len(employees.keys()) # Considers that first key is the title
+    new_id= len(employees.keys()) # Considers that first key is the title, adds to end
     employees[new_id]=[
     msg_name,
     msg_street,
@@ -123,23 +146,93 @@ def add_employee():
     ]
     line = ""
     unwanted_chars = ["[","]","'"]
-    with open(cwd + "\\" + "hr_records.csv", "a") as input_file:
-        line += str(employees[new_id])
-        for i in unwanted_chars:
-            line = line.replace(i, "")
-        line = str(new_id)+","+ line + "\n"
-        input_file.write(line)
-    line = ""
+    line += str(employees[new_id])
+    for i in unwanted_chars:
+        line = line.replace(i, "")
+    line = str(new_id)+","+ line + "\n"
+    append_csv(line)
 
+
+def show_id_name():
+    table = "\n"
+    for k,v in employees.items():
+        table += "{:^3}".format(k) + "|"
+        table += "{:^10}".format( v[0][:10] ) + "|" + "\n"
+    print (table)
 
 def edit_employee():
-    print("edit")
-    pass
+    show_id_name()
+    msg_id = input("\nSelect employee ID to edit: ")
+    msg_field = input("""'NAME','STREET','CITY','STATE','ZIP','SSN','DOB','JOB','START','END'
+    Type field to edit: """)
+    msg_value = input("""\n Type new value: """)
+    employees[msg_id][ fields[msg_field.lower()] ] = msg_value
+    update_csv()
 
 
 def list_past_employee():
     print("past")
     pass
+
+
+def report_all_csv():
+    with open(cwd + "\\" + "hr_report.csv", "w") as file:
+        content = ""
+        for k,v in employees.items():
+            content += k + ","
+            for i in range (len(v)):
+                if i == (len(v)-1):
+                    content += v[i] + "\n"
+                else:
+                    content += v[i] + ","
+        file.write(content)
+
+
+
+def report_current_csv():
+    with open(cwd + "\\" + "hr_report.csv", "w") as file:
+        content = ""
+        for k,v in employees.items():
+            if v[-1].lower() == "active" or v[-1].lower() == "end":
+                content += k + ","
+                for i in range (len(v)):
+                    if i == (len(v)-1):
+                        content += v[i] + "\n"
+                    else:
+                        content += v[i] + ","
+        file.write(content)
+
+
+def report_past_csv():
+    with open(cwd + "\\" + "hr_report.csv", "w") as file:
+        content = ""
+        for k,v in employees.items():
+            if "active" not in v[-1].lower() or v[-1].lower() == "end":
+                content += k + ","
+                for i in range (len(v)):
+                    if i == (len(v)-1):
+                        content += v[i] + "\n"
+                    else:
+                        content += v[i] + ","
+        file.write(content)
+
+
+def update_csv(): # Converts employees to csv format
+    with open(cwd + "\\" + "hr_records.csv", "w") as file:
+        content = ""
+        for k,v in employees.items():
+            content += k + ","
+            for i in range (len(v)):
+                if i == (len(v)-1):
+                    content += v[i] + "\n"
+                else:
+                    content += v[i] + ","
+        file.write(content)
+
+
+def append_csv(line): # Entry line must be in csv format
+    with open(cwd + "\\" + "hr_records.csv", "a") as file:
+        file.write(line)
 
 
 def salir():
