@@ -21,9 +21,12 @@ fields = { # Used to convert fields to list
 "end":9,
 }
 
-header_break = "-"*3 + " "*2 + "-"*10 + " "*2 + "-"*20 + " "*2 + "-"*10 + " "*2 +\
+header_break = "-"*3 + " "*2 + "-"*20 + " "*2  + "-"*10 + " "*2 +\
 "-"*7 + " "*2 + "-"*7 + " "*2 + "-"*13 + " "*2 + "-"*13 + " "*2 + "-"*20 +\
 " "*2 + "-"*13 + " "*2 + "-"*10 + " "*2
+#header_break = "-"*3 + " "*2 + "-"*10 + " "*2 + "-"*20 + " "*2 + "-"*10 + " "*2 +\
+#"-"*7 + " "*2 + "-"*7 + " "*2 + "-"*13 + " "*2 + "-"*13 + " "*2 + "-"*20 +\
+#" "*2 + "-"*13 + " "*2 + "-"*10 + " "*2
 unwanted_chars = [
     ".",
     ",",
@@ -82,10 +85,11 @@ def create_database(line):
 def display_all_employees():
     # "ID":["NAME","STREET","CITY","STATE","ZIP","SSN","DOB","JOB","START","END"]
     print("\n")
+    print("Full data not display, see csv file for details:")
     for k,v in employees.items():
         name,street,city,state,zip,ssn,dob,job,start,end = v
-        print ("{:^5}{:^12}{:^22}{:^12}{:^9}{:^9}{:^15}{:^15}{:^22}{:^15}{:^12}\
-        ".format(k,name,street,city,state,zip,ssn,dob,job,start,end))
+        print ("{:^5}{:^22}{:^12}{:^9}{:^9}{:^15}{:^15}{:^22}{:^15}{:^12}\
+        ".format(k,name[:20],city[:10],state,zip,ssn,dob,job[:20],start,end))
         if k == "ID":
             print(header_break)
     while True:
@@ -106,11 +110,12 @@ def display_all_employees():
 def display_current_employees():
     # "ID":["NAME","STREET","CITY","STATE","ZIP","SSN","DOB","JOB","START","END"]
     print("\n")
+    print("Full data not display, see csv file for details:")
     for k,v in employees.items():
         if v[-1].lower() == "active" or v[-1].lower() == "end":
             name,street,city,state,zip,ssn,dob,job,start,end = v
-            print ("{:^5}{:^12}{:^22}{:^12}{:^9}{:^9}{:^15}{:^15}{:^22}{:^15}{:^12}\
-            ".format(k,name,street,city,state,zip,ssn,dob,job,start,end))
+            print ("{:^5}{:^22}{:^12}{:^9}{:^9}{:^15}{:^15}{:^22}{:^15}{:^12}\
+            ".format(k,name[:20],city[:10],state,zip,ssn,dob,job[:20],start,end))
             if k == "ID":
                 print(header_break)
     while True:
@@ -131,11 +136,12 @@ def display_current_employees():
 def display_past_employees():
     # "ID":["NAME","STREET","CITY","STATE","ZIP","SSN","DOB","JOB","START","END"]
     print("\n")
+    print("Full data not display, see csv file for details:")
     for k,v in employees.items():
         if "active" not in v[-1].lower() or v[-1].lower() == "end":
             name,street,city,state,zip,ssn,dob,job,start,end = v
-            print ("{:^5}{:^12}{:^22}{:^12}{:^9}{:^9}{:^15}{:^15}{:^22}{:^15}{:^12}\
-            ".format(k,name,street,city,state,zip,ssn,dob,job,start,end))
+            print ("{:^5}{:^22}{:^12}{:^9}{:^9}{:^15}{:^15}{:^22}{:^15}{:^12}\
+            ".format(k,name[:20],city[:10],state,zip,ssn,dob,job[:20],start,end))
             if k == "ID":
                 print(header_break)
     while True:
@@ -209,14 +215,13 @@ def clean_state():
     while True: # Validate STATE
         msg_state = input("\nType STATE (must be 2 char, example 'WA'): ")
         try:
-            len(msg_state.lower()) == 2
-        except False:
-            continue
-        if len(msg_state.lower()) == 2 and msg_state[0].isdigit() == False and msg_state[1].isdigit()==False:
+            states_dic[msg_state.lower()]
             break
+        except KeyError:
+            continue
         print("type only 2 characters, no numbers allowed :")
         continue
-    return (msg_state)
+    return (msg_state.upper())
 
 
 def clean_zip():
@@ -265,11 +270,15 @@ def clean_dob():
     while True:  # Validate DOB
         msg_dob = input("\nType DOB (format must be 'MMM/DD/YYYY'): ")
         try:
+            month_dic[msg_dob[:3].lower()]
             for i in range(11):
                 if i == 4 or i ==5:
                     int(msg_dob[i])
                 elif i >= 7:
                     int(msg_dob[i])
+        except KeyError:
+            print("month must be 3 char, example 'dec' ")
+            continue
         except NameError:
             continue
         except ValueError:
@@ -292,18 +301,22 @@ def clean_start():
     while True:  # Validate START date
         msg_start = input("\nType START date (format must be 'MMM/DD/YYYY'): ")
         try:
+            month_dic[msg_start[:3].lower()]
             for i in range(11):
                 if i == 4 or i ==5:
                     int(msg_start[i])
                 elif i >= 7:
                     int(msg_start[i])
+        except KeyError:
+            print("month must be 3 char, example 'jan' ")
+            continue
         except NameError:
             continue
         except ValueError:
             continue
         except IndexError:
             continue
-        if len(msg_start) == 11 and msg_start[3] == "/" and msg_start[6] == "/" and msg_start[0].isdigit() == False and msg_start[1].isdigit() == False and msg_start[2].isdigit() == False:
+        if len(msg_start) == 11 and msg_start[3] == "/" and msg_start[6] == "/":
             break
         print("Format example = (3 letters('feb') '/' 2 numbers('08') '/' 4 numbers(2008)): ")
         continue
@@ -325,18 +338,22 @@ def clean_end():
             while True:  # Validate END date
                 msg_end = input("\nType END date (format must be 'MMM/DD/YYYY') : ")
                 try:
+                    month_dic[msg_end[:3].lower()]
                     for i in range(11):
                         if i == 4 or i ==5:
                             int(msg_end[i])
                         elif i >= 7:
                             int(msg_end[i])
+                except KeyError:
+                    print("month must be 3 char, example 'sep' ")
+                    continue
                 except NameError:
                     continue
                 except ValueError:
                     continue
                 except IndexError:
                     continue
-                if len(msg_end) == 11 and msg_end[3] == "/" and msg_end[6] == "/" and msg_end[0].isdigit() == False and msg_end[1].isdigit() == False and msg_end[2].isdigit() == False:
+                if len(msg_end) == 11 and msg_end[3] == "/" and msg_end[6] == "/":
                     break
                 print("Format example = (3 letters('feb') '/' 2 numbers('08') '/' 4 numbers(2008)): ")
                 continue
@@ -351,7 +368,7 @@ def show_id_name():
     table = "\n"
     for k,v in employees.items():
         table += "{:^3}".format(k) + "|"
-        table += "{:^10}".format( v[0][:10] ) + "|" + "\n"
+        table += "{:^20}".format( v[0][:20] ) + "|" + "\n"
     print (table)
 
 
@@ -383,11 +400,6 @@ def edit_employee():
     msg_value = fields_fun[msg_field]() # Clean the data using dictionary accordingly
     employees[msg_id][ fields[msg_field.lower()] ] = msg_value
     update_csv()
-
-
-def list_past_employee():
-    print("past")
-    pass
 
 
 def report_all_csv():
@@ -452,7 +464,7 @@ def append_csv(line): # Entry line must be in csv format
 def salir():
     sys.exit()
 
-fields_fun = { # Assings funtions to fields
+fields_fun = { # Assings funtions to clean fields
 "name":clean_name,
 "street":clean_street,
 "city":clean_city,
@@ -464,6 +476,69 @@ fields_fun = { # Assings funtions to fields
 "start":clean_start,
 "end":clean_end,
 }
+
+states_dic = { # Assings funtions to clean fields
+"al":"alabama",
+"ak":"alaska",
+"as":"american samoa",
+"az":"arizona",
+"ar":"arkansas",
+"ca":"california",
+"co":"colorado",
+"ct":"connecticut",
+"de":"delaware",
+"dc":"district of columbia",
+"fl":"florida",
+"ga":"georgia",
+"guam":"gu",
+"hi":"hawaii",
+"id":"idaho",
+"il":"illinois",
+"in":"indiana",
+"ia":"iowa",
+"ks":"kansas",
+"ky":"kentucky",
+"la":"louisiana",
+"me":"maine",
+"md":"maryland",
+"ma":"massachusetts",
+"mi":"michigan",
+"mn":"minnesota",
+"ms":"mississippi",
+"mo":"missouri",
+"mt":"montana",
+"ne":"nebraska",
+"nv":"nevada",
+"nh":"new hampshire",
+"nj":"new jersey",
+"nm":"new mexico",
+"ny":"new york",
+"nc":"north carolina",
+"nd":"norht dakota",
+"mp":"northern mariana is",
+"oh":"ohio",
+"ok":"oklahoma",
+"or":"oregon",
+"pa":"pennsylvania",
+"pr":"puerto rico",
+"ri":"rhode island",
+"sc":"south carolina",
+"sd":"south dakota",
+"tn":"tennessee",
+"tx":"texas",
+"ut":"utah",
+"vt":"vermont",
+"va":"virginia",
+"vi":"virgin islands",
+"wa":"washington",
+"wv":"west virginia",
+"wi":"wisconsin",
+"wy":"wyoming",
+}
+month_dic = {"jan":"january","feb":"february","mar":"march","apr":"april",
+"may":"may","jun":"june","jul":"july","aug":"august","sep":"september",
+"oct":"october","nov":"november","dec":"december"}
+
 
 def main():
     main_d = {
@@ -484,3 +559,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+##to do: testing and
+##The system needs to be able to display reminders to schedule an annual review with an employee 3 months prior to their individual review date. This can just be shown on the screen for the purpose of this assignment.
+#
+#Because this system is used to store data about people it is very important that it is tested well, using automated testing techniques.
