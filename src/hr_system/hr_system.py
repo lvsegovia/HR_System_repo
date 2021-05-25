@@ -1,8 +1,10 @@
 import sys
 import os
 from operator import itemgetter
-#import pyinputplus as inpt
+from datetime import date
 
+current_date = date.today()
+date_mm_dd_yyyy=current_date.strftime("%m/%d/%Y")
 cwd = os.getcwd()
 employees = {
 # Format:
@@ -59,14 +61,17 @@ unwanted_chars = [
     "}",
     "\\", # Backslash has to be doubled
 ]
-prompt = "\n HR SYSTEM OPTION MENU"
+prompt = "*"*100
+prompt += "\n HR SYSTEM OPTION MENU"
+prompt += "\n NOTE: ** Individual reviews are once a year after one year of START date **"
 prompt += "\n Press 1: 'Display all employees'"
 prompt += "\n Press 2: 'Display current employees'"
 prompt += "\n Press 3: 'Display past employees'"
 prompt += "\n Press 4: 'Add new employee'"
 prompt += "\n Press 5: 'Edit employee record'"
-prompt += "\n Press 6: 'Exit program'"
-prompt += "\n Type '1','2','3','4','5' or '6' then hit Enter:"
+prompt += "\n Press 6: 'Display employees that left within last month'"
+prompt += "\n Press 7: 'Exit program'"
+prompt += "\n Type '1','2','3','4','5' or '6' then hit Enter: "
 
 
 def read_csv():
@@ -454,11 +459,58 @@ def update_csv(): # Converts employees to csv format
                 else:
                     content += v[i] + ","
         file.write(content)
+    review_reminder()
 
 
 def append_csv(line): # Entry line must be in csv format
-    with open(cwd + "\\" + "hr_records.csv", "a") as file:
-        file.write(line)
+    try:
+        with open(cwd + "\\" + "hr_records.csv", "a") as file:
+            file.write(line)
+        review_reminder()
+    except PermissionError:
+        print("Close csv file while using the System!")
+
+
+def display_past_month_employees():
+    table = "\n"
+    print("\nToday is " + date_mm_dd_yyyy)
+    current_month_integer = int(date_mm_dd_yyyy[:2])
+    for k,v in month_dic.items():
+        for months in v:
+            if date_mm_dd_yyyy[:2] in months:
+                month=k
+    print("The employees that left last " + month.upper() +" "+ date_mm_dd_yyyy[-4:] + " :")
+    for k,v in employees.items():
+        # Field 9 is the date in mmm/dd/yyyy format
+        if v[9].lower() == "active" or v[9].lower() == "end":
+            pass
+        elif len(v[9])==11:
+            if date_mm_dd_yyyy[-4:] == v[9][-4:] and abs( current_month_integer - int(month_dic[v[9][:3]][1]) ) <= 1:
+                table += "{:^3}".format(k) + "|"
+                table += "{:^20}".format( v[0][:20] ) + "|"
+                table += "{:^15}".format( v[9] ) + "|" + "\n"
+    print (table)
+
+
+def review_reminder():
+    reminder = "\n"+"*"*100
+    reminder +="\nDue for review employees: \n"
+    no_reminder="No one is due for annual review."
+    current_month_integer = int(date_mm_dd_yyyy[:2])
+    for k,v in employees.items():
+        # Field 8 is START in mmm/dd/yyyy format, Field 9 is active indicator
+        if v[9].lower() == "active":
+            if int(month_dic[v[8][:3]][1]) - current_month_integer < 0:
+                pass
+            elif int(month_dic[v[8][:3]][1]) - current_month_integer <= 3:
+                reminder += "{:^3}".format(k) + "|"
+                reminder += "{:^20}".format( v[0][:20] ) + "|"
+                reminder += "{:^15}".format( v[8][:6] ) + "|" + "\n"
+    if len(reminder) > 0:
+        print(reminder)
+        return reminder
+    else:
+        return no_reminder
 
 
 def salir():
@@ -535,9 +587,20 @@ states_dic = { # Assings funtions to clean fields
 "wi":"wisconsin",
 "wy":"wyoming",
 }
-month_dic = {"jan":"january","feb":"february","mar":"march","apr":"april",
-"may":"may","jun":"june","jul":"july","aug":"august","sep":"september",
-"oct":"october","nov":"november","dec":"december"}
+month_dic = {
+"jan":["january","01"],
+"feb":["february","02"],
+"mar":["march","03"],
+"apr":["april","04"],
+"may":["may","05"],
+"jun":["june","06"],
+"jul":["july","07"],
+"aug":["august","08"],
+"sep":["september","09"],
+"oct":["october","10"],
+"nov":["november","11"],
+"dec":["december","12"],
+}
 
 
 def main():
@@ -547,9 +610,11 @@ def main():
         "3":display_past_employees,
         "4":add_employee,
         "5":edit_employee,
-        "6":salir,
+        "6":display_past_month_employees,
+        "7":salir,
     }
     read_csv() # Create a database based on existing file
+    review_reminder()
     while True:
         try:
             main_d[input(prompt)]()
@@ -560,8 +625,6 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-##to do: testing and
-##The system needs to be able to display reminders to schedule an annual review with an employee 3 months prior to their individual review date. This can just be shown on the screen for the purpose of this assignment.
+##The system needs to be able to display reminders to schedule an annual review with an employee 3 months prior to their individual review date.
 #
-#Because this system is used to store data about people it is very important that it is tested well, using automated testing techniques.
+#Do pytests
