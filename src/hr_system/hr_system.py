@@ -92,7 +92,7 @@ prompt += "\n Press 4: 'Add new employee'"
 prompt += "\n Press 5: 'Edit employee record'"
 prompt += "\n Press 6: 'Display employees that left within last month'"
 prompt += "\n Press 7: 'Exit program'"
-prompt += "\n Type '1','2','3','4','5' or '6' then hit Enter: "
+prompt += "\n Type '1','2','3','4','5','6' or '7' then hit Enter: "
 
 
 def read_csv():
@@ -105,8 +105,17 @@ def read_csv():
 def create_database(line):
     line = line.replace("\n", "")  # Removes end of row delimited by "\n"
     line_list = line.split(",")  # A row ends with "\n"
+    line_list = strip_spaces(line_list)
     employees[line_list[0]] = line_list[1:]
     return employees
+
+
+def strip_spaces(list):
+    clean_list=[]
+    for i in list:
+        clean_list.append(i.strip())
+    return clean_list
+
 
 def display_all_employees():
     # "ID":["NAME","STREET","CITY","STATE","ZIP","SSN","DOB","JOB","START","END"]
@@ -225,11 +234,12 @@ def add_employee():
     ]
     # Format to write in csv
     line = ""
-    unwanted_chars = ["[", "]", "'"]
-    line += str(employees[new_id])
-    for i in unwanted_chars:
-        line = line.replace(i, "")
-    line = str(new_id) + "," + line + "\n"
+    for v in employees[new_id]: # Convert to csv format
+        if v == employees[new_id][-1]:
+            line += v
+        else:
+            line += v + ","
+    line = str(new_id) + "," + line + "\n" # Add employeed ID
     append_csv(line)
 
 
@@ -475,7 +485,7 @@ def edit_employee():
             print("Type valid field")
             continue
         continue
-    msg_value = fields_fun[msg_field]()  # Clean the data using dictionary accordingly
+    msg_value = fields_fun[msg_field.lower()]()  # Clean the data using dictionary accordingly
     employees[msg_id][fields[msg_field.lower()]] = msg_value
     update_csv()
 
@@ -522,17 +532,21 @@ def report_past_csv():
 
 
 def update_csv():  # Converts employees to csv format
-    with open(cwd + "\\" + "hr_records.csv", "w") as file:
-        content = ""
-        for k, v in employees.items():
-            content += k + ","
-            for i in range(len(v)):
-                if i == (len(v) - 1):
-                    content += v[i] + "\n"
-                else:
-                    content += v[i] + ","
-        file.write(content)
-    review_reminder()
+    try:
+        with open(cwd + "\\" + "hr_records.csv", "w") as file:
+            content = ""
+            for k, v in employees.items():
+                content += k + ","
+                for i in range(len(v)):
+                    if i == (len(v) - 1):
+                        content += v[i] + "\n"
+                    else:
+                        content += v[i] + ","
+            file.write(content)
+        review_reminder()
+    except PermissionError:
+        print("**Close csv file while using the System!**")
+        print("**WARNING, Record not saved!**")
 
 
 def append_csv(line):  # Entry line must be in csv format
@@ -541,7 +555,8 @@ def append_csv(line):  # Entry line must be in csv format
             file.write(line)
         review_reminder()
     except PermissionError:
-        print("Close csv file while using the System!")
+        print("**Close csv file while using the System!**")
+        print("**WARNING, Record not saved!**")
 
 
 def display_past_month_employees():
